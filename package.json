@@ -1,6 +1,6 @@
 {
   "name": "nestform",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A utility for encoding and decoding nested FormData objects.",
   "type": "module",
   "license": "MIT",
