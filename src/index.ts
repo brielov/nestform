@@ -10,18 +10,34 @@ export function isObject(input: unknown): input is { [key: string]: unknown } {
 }
 
 /**
+ * Configuration options for encoding
+ */
+export interface EncodeOptions {
+  /**
+   * How to handle Date objects during encoding
+   * - 'iso': Convert to ISO 8601 string (default)
+   * - 'timestamp': Convert to Unix timestamp (number)
+   * - 'string': Use Date.toString() method
+   */
+  dateFormat?: 'iso' | 'timestamp' | 'string'
+}
+
+/**
  * Encodes a plain object into FormData
  * @param data - The object to encode
+ * @param options - Configuration options for encoding
  * @returns FormData instance containing the encoded data
  * @throws Error if the input is not a plain object
  */
 export function encode<T extends { [key: string]: unknown }>(
   data: T,
+  options: EncodeOptions = {},
 ): FormData {
   if (!isObject(data)) {
     throw new Error('The provided data must be a plain object.')
   }
 
+  const { dateFormat = 'iso' } = options
   const formData = new FormData()
 
   function append(key: string, value: unknown): void {
@@ -29,6 +45,22 @@ export function encode<T extends { [key: string]: unknown }>(
       Object.entries(value).forEach(([k, v]) => append(`${key}[${k}]`, v))
     } else if (Array.isArray(value)) {
       value.forEach((v, k) => append(`${key}[${k}]`, v))
+    } else if (value instanceof Date) {
+      let dateValue: string | number
+      switch (dateFormat) {
+        case 'iso':
+          dateValue = value.toISOString()
+          break
+        case 'timestamp':
+          dateValue = value.getTime()
+          break
+        case 'string':
+          dateValue = value.toString()
+          break
+        default:
+          dateValue = value.toISOString()
+      }
+      formData.append(key, String(dateValue))
     } else if (value instanceof Blob || typeof value === 'string') {
       formData.append(key, value)
     } else if (typeof value === 'number' || typeof value === 'boolean') {

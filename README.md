@@ -40,6 +40,7 @@ const data = {
     city: 'New York',
   },
   hobbies: ['reading', 'gaming'],
+  createdAt: new Date(),
 }
 
 const formData = encode(data)
@@ -50,6 +51,22 @@ const formData = encode(data)
 // address[city]: "New York"
 // hobbies[0]: "reading"
 // hobbies[1]: "gaming"
+// createdAt: "2024-01-15T10:30:00.000Z" (ISO format by default)
+```
+
+### Date Handling
+
+You can configure how Date objects are encoded:
+
+```typescript
+// ISO format (default)
+const formData1 = encode(data, { dateFormat: 'iso' })
+
+// Unix timestamp
+const formData2 = encode(data, { dateFormat: 'timestamp' })
+
+// Date.toString() format
+const formData3 = encode(data, { dateFormat: 'string' })
 ```
 
 ### Decoding FormData to Objects
@@ -95,11 +112,15 @@ const data3 = decode(formData, { emptyString: 'set undefined' })
 
 ## API Reference
 
-### `encode(data: object): FormData`
+### `encode(data: object, options?: EncodeOptions): FormData`
 
 Converts a plain object into FormData.
 
 - `data`: A plain object to encode
+- `options.dateFormat`: How to handle Date objects
+  - `'iso'`: Convert to ISO 8601 string (default)
+  - `'timestamp'`: Convert to Unix timestamp (number)
+  - `'string'`: Use Date.toString() method
 - Returns: A FormData instance
 
 ### `decode(formData: FormData, options?: { emptyString?: 'preserve' | 'set null' | 'set undefined' }): object`

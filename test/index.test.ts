@@ -122,6 +122,61 @@ describe('encode', () => {
     expect(formData.get('settings[notifications][email]')).toBe('true')
     expect(formData.get('settings[notifications][push]')).toBe('false')
   })
+
+  it('should handle Date objects with default ISO format', () => {
+    const date = new Date('2024-01-15T10:30:00Z')
+    const data = {
+      createdAt: date,
+      updatedAt: date,
+    }
+    const formData = encode(data)
+    expect(formData.get('createdAt')).toBe(date.toISOString())
+    expect(formData.get('updatedAt')).toBe(date.toISOString())
+  })
+
+  it('should handle Date objects with timestamp format', () => {
+    const date = new Date('2024-01-15T10:30:00Z')
+    const data = {
+      createdAt: date,
+    }
+    const formData = encode(data, { dateFormat: 'timestamp' })
+    expect(formData.get('createdAt')).toBe(String(date.getTime()))
+  })
+
+  it('should handle Date objects with string format', () => {
+    const date = new Date('2024-01-15T10:30:00Z')
+    const data = {
+      createdAt: date,
+    }
+    const formData = encode(data, { dateFormat: 'string' })
+    expect(formData.get('createdAt')).toBe(date.toString())
+  })
+
+  it('should handle nested Date objects', () => {
+    const date = new Date('2024-01-15T10:30:00Z')
+    const data = {
+      user: {
+        createdAt: date,
+        profile: {
+          lastLogin: date,
+        },
+      },
+    }
+    const formData = encode(data)
+    expect(formData.get('user[createdAt]')).toBe(date.toISOString())
+    expect(formData.get('user[profile][lastLogin]')).toBe(date.toISOString())
+  })
+
+  it('should handle Date objects in arrays', () => {
+    const date1 = new Date('2024-01-15T10:30:00Z')
+    const date2 = new Date('2024-01-16T11:45:00Z')
+    const data = {
+      events: [date1, date2],
+    }
+    const formData = encode(data)
+    expect(formData.get('events[0]')).toBe(date1.toISOString())
+    expect(formData.get('events[1]')).toBe(date2.toISOString())
+  })
 })
 
 describe('decode', () => {
