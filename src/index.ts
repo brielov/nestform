@@ -120,10 +120,6 @@ export function decode<T extends EmptyStringStrategy = 'preserve'>(
   formData: FormData,
   options: { emptyString?: T } = {},
 ): DecodeObjectWithStrategy<T> {
-  if (!(formData instanceof FormData)) {
-    throw new TypeError('The provided data must be a FormData instance.')
-  }
-
   const { emptyString = 'preserve' as T } = options
   const result = Object.create(null) as DecodeObjectWithStrategy<T>
 
