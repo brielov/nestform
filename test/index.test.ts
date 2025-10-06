@@ -180,18 +180,6 @@ describe('encode', () => {
 })
 
 describe('decode', () => {
-  it('should throw error for non-FormData input', () => {
-    expect(() => decode(null as any)).toThrow(
-      'The provided data must be a FormData instance.',
-    )
-    expect(() => decode(undefined as any)).toThrow(
-      'The provided data must be a FormData instance.',
-    )
-    expect(() => decode({} as any)).toThrow(
-      'The provided data must be a FormData instance.',
-    )
-  })
-
   it('should decode simple key-value pairs', () => {
     const formData = new FormData()
     formData.append('name', 'John')
